@@ -1,8 +1,8 @@
 import React from 'react';
 import { Button, Col, Modal, Row } from 'react-bootstrap';
-import ClientForm from './ClientForm';
+import PlanForm from './PlanForm';
 
-class ClientModal extends React.Component {
+class PlanModal extends React.Component {
   constructor(props) {
     super(props);
 
@@ -14,7 +14,6 @@ class ClientModal extends React.Component {
     this.handleClose = this.handleClose.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
-
 
   handleClose(e) {
     this.setState({ show: false });
@@ -48,12 +47,13 @@ class ClientModal extends React.Component {
             size="lg"
           >
             <Modal.Header closeButton>
-              <Modal.Title>Adicionar Cliente</Modal.Title>
+              <Modal.Title>Adicionar Plano</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              <ClientForm
-                onSubmit={this.handleSubmit}>
-              </ClientForm>
+              <PlanForm
+                plan={{ permitLegalPerson: false }}
+                onSubmit={this.handleSubmit}
+              ></PlanForm>
             </Modal.Body>
             <Modal.Footer>
               <Button variant="danger" onClick={this.handleClose}>
@@ -67,4 +67,4 @@ class ClientModal extends React.Component {
   }
 }
 
-export default ClientModal;
+export default PlanModal;
