@@ -24,7 +24,6 @@ class PlanModal extends React.Component {
   }
 
   handleSubmit(e) {
-    this.props.onSubmit(e);
     this.handleClose(e);
   }
 

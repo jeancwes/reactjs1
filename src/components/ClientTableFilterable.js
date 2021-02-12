@@ -1,7 +1,8 @@
 import React from 'react';
+import { connect } from 'react-redux'
 import { Col, Row } from 'react-bootstrap';
 import ClientModal from './ClientModal';
-import { format } from 'date-fns';
+import { getClients } from '../store/actions/client';
 
 const axios = require('axios');
 
@@ -69,15 +70,10 @@ class SearchBar extends React.Component {
     super(props);
     
     this.handleFilterTextChange = this.handleFilterTextChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   handleFilterTextChange(e) {
     this.props.onFilterTextChange(e.target.value);
-  }
-
-  handleSubmit(e) {
-    this.props.onSubmit(e);
   }
 
   render() {
@@ -95,9 +91,7 @@ class SearchBar extends React.Component {
           </form>
         </Col>
         <Col>
-          <ClientModal
-            onSubmit={this.handleSubmit}>
-          </ClientModal>      
+          <ClientModal />     
         </Col>
       </Row>
     );
@@ -114,7 +108,6 @@ class ClientTableFilterable extends React.Component {
     };
 
     this.handleFilterTextChange = this.handleFilterTextChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   componentDidMount() {
@@ -125,13 +118,7 @@ class ClientTableFilterable extends React.Component {
     axios.get('http://localhost:5000/api/clients')
       .then(function (response) {
         console.log(response);
-        const clients = response.data.map((client) => {
-          client.bornDate = format(new Date(client.bornDate), 'dd/MM/yyy');
-          return client;
-        });
-        this.setState({
-          clients: clients
-        })
+        this.props.getClients(response.data);
       }.bind(this))
       .catch(function (error) {
         console.log(error);
@@ -144,20 +131,15 @@ class ClientTableFilterable extends React.Component {
     });
   }
 
-  handleSubmit(e) {
-    this.getClients();
-  }
-
   render() {
     return (
       <div>
         <SearchBar
           filterText={this.state.filterText}
           onFilterTextChange={this.handleFilterTextChange}
-          onSubmit={this.handleSubmit}
         />
         <ClientTable
-          clients={this.state.clients}
+          clients={this.props.clients}
           filterText={this.state.filterText}
         />
       </div>
@@ -165,4 +147,23 @@ class ClientTableFilterable extends React.Component {
   }
 }
 
-export default ClientTableFilterable;
+
+function mapStateToProps(state) {
+  return {
+    clients: state.clients
+  }
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    getClients(newClients) {
+      const action = getClients(newClients);
+      dispatch(action);
+    }
+  }
+}
+
+export default connect(
+  mapStateToProps, 
+  mapDispatchToProps
+)(ClientTableFilterable);

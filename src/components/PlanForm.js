@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
+import { connect } from 'react-redux'
 import { Button, Col, Form, Row } from 'react-bootstrap';
+import { postPlan } from '../store/actions/plan';
 const axios = require('axios');
 
 function PlanForm(props) {
@@ -8,12 +10,10 @@ function PlanForm(props) {
   const handleSubmit = (e) => {
     e.preventDefault()
 
-    console.log('submit');
-    console.log(plan);
-
     axios.post('http://localhost:5000/api/plans', plan)
       .then(function (response) {
         console.log(response);
+        props.postPlan(response.data);
         props.onSubmit(e);
       })
       .catch(function (error) {
@@ -66,4 +66,22 @@ function PlanForm(props) {
   );
 }
 
-export default PlanForm;
+function mapStateToProps(state) {
+  return {
+    plans: state.plans
+  }
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    postPlan(newPlan) {
+      const action = postPlan(newPlan);
+      dispatch(action);
+    }
+  }
+}
+
+export default connect(
+  mapStateToProps, 
+  mapDispatchToProps
+)(PlanForm);

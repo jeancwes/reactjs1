@@ -1,22 +1,38 @@
 import React, { useState } from 'react';
+import { connect } from 'react-redux'
+// import { Button, Col, Form, Row } from 'react-bootstrap';
 import { Button, Col, Form, Row } from 'react-bootstrap';
+// import { Formik, Form, Field } from 'formik';
+// import * as Yup from 'yup';
+import { postClient } from '../store/actions/client';
+
 const axios = require('axios');
+
+// const SignupSchema = Yup.object().shape({
+//   name: Yup.string()
+//     .min(2, 'Too Short!')
+//     .max(50, 'Too Long!')
+//     .required('Required'),
+//   cpfCnpj: Yup.string()
+//     .min(2, 'Too Short!')
+//     .max(50, 'Too Long!')
+//     .required('Required'),
+//   email: Yup.string().email('Invalid email').required('Required'),
+// });
 
 function ClientForm(props) {
 
-  const [client, setClient] = useState(props.client)
+  const [client, setClient] = useState(props.client);
 
   const handleSubmit = (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
     client.plans = [{ planId: 1 }];
-
-    console.log('submit');
-    console.log(client);
 
     axios.post('http://localhost:5000/api/clients', client)
       .then(function (response) {
         console.log(response);
+        props.postClient(response.data);
         props.onSubmit(e);
       })
       .catch(function (error) {
@@ -25,6 +41,38 @@ function ClientForm(props) {
   }
 
   return (
+    // <>
+    //   <Formik
+    //    validationSchema={SignupSchema}
+    //    onSubmit={handleSubmit}
+    //  >
+    //    {({ errors, touched }) => (
+    //      <Form>
+    //         <Row>
+    //           <Col>
+    //             <label htmlFor="name">Nome</label>
+    //             <Field name="name" className="form-control" />
+    //             {errors.name && touched.name ? (
+    //               <div>{errors.name}</div>
+    //             ) : null}
+    //           </Col>
+    //           <Col>
+    //             <label htmlFor="cpfCnpj">CPF / CNPJ</label>
+    //             <Field name="cpfCnpj" className="form-control" />
+    //             {errors.cpfCnpj && touched.cpfCnpj ? (
+    //               <div>{errors.cpfCnpj}</div>
+    //             ) : null}
+    //           </Col>
+    //         </Row>
+    //        <Field name="email" type="email" />
+    //        {errors.email && touched.email ? <div>{errors.email}</div> : null}
+    //        <Button variant="primary" className="float-right" type="submit">
+    //         Salvar
+    //        </Button>
+    //      </Form>
+    //    )}
+    //  </Formik>
+    // </>
     <Form onSubmit={handleSubmit}>
       <Row>
         <Col>
@@ -87,4 +135,22 @@ function ClientForm(props) {
   );
 }
 
-export default ClientForm;
+function mapStateToProps(state) {
+  return {
+    clients: state.clients
+  }
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    postClient(newClient) {
+      const action = postClient(newClient);
+      dispatch(action);
+    }
+  }
+}
+
+export default connect(
+  mapStateToProps, 
+  mapDispatchToProps
+)(ClientForm);

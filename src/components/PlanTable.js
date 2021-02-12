@@ -1,7 +1,8 @@
 import React from 'react';
+import { connect } from 'react-redux'
 import { Col, Row } from 'react-bootstrap';
 import PlanModal from './PlanModal';
-import { format } from 'date-fns';
+import { getPlans } from '../store/actions/plan';
 
 const axios = require('axios');
 
@@ -13,7 +14,7 @@ class PlanRow extends React.Component {
       <tr>
         <td># {plan.id}</td>
         <td>{plan.name}</td>
-        <td>{plan.permitLegalPerson}</td>
+        <td>{plan.permitLegalPersonLabel()}</td>
         <td>{plan.startEffectiveDate}</td>
         <td>{plan.endEffectiveDate}</td>
       </tr>
@@ -29,15 +30,9 @@ class PlanTable extends React.Component {
     this.state = {
       plans: []
     };
-
-    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   componentDidMount() {
-    this.getPlans();
-  }
-
-  handleSubmit(e) {
     this.getPlans();
   }
 
@@ -45,15 +40,7 @@ class PlanTable extends React.Component {
     axios.get('http://localhost:5000/api/plans')
       .then(function (response) {
         console.log(response);
-        const plans = response.data.map((plan) => {
-          plan.startEffectiveDate = format(new Date(plan.startEffectiveDate), 'dd/MM/yyy');
-          plan.endEffectiveDate = format(new Date(plan.endEffectiveDate), 'dd/MM/yyy');
-          plan.permitLegalPerson = (plan.permitLegalPerson) ? 'Sim' : 'Não';
-          return plan;
-        });
-        this.setState({
-          plans: plans
-        })
+        this.props.getPlans(response.data);
       }.bind(this))
       .catch(function (error) {
         console.log(error);
@@ -63,7 +50,7 @@ class PlanTable extends React.Component {
   render() {
     const rows = [];
 
-    this.state.plans.forEach((plan) => {
+    this.props.plans.forEach((plan) => {
       rows.push(
         <PlanRow
           plan={plan}
@@ -76,7 +63,7 @@ class PlanTable extends React.Component {
       <>
         <Row className="my-3">
           <Col>
-            <PlanModal onSubmit={this.handleSubmit} />
+            <PlanModal />
           </Col>
         </Row>
         <table className="table">
@@ -96,4 +83,22 @@ class PlanTable extends React.Component {
   }
 }
 
-export default PlanTable;
+function mapStateToProps(state) {
+  return {
+    plans: state.plans
+  }
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    getPlans(newPlans) {
+      const action = getPlans(newPlans);
+      dispatch(action);
+    }
+  }
+}
+
+export default connect(
+  mapStateToProps, 
+  mapDispatchToProps
+)(PlanTable);
