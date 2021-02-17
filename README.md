@@ -2,16 +2,16 @@
 
 ## Instalação do NodeJS
 
-Para rodar o projeto é necessário ter o NodeJS.
+Para rodar o projeto é necessário ter instalado o NodeJS.
 
 Link para [download do NodeJS](https://nodejs.org/pt-br/)
 
 ## Executar o projeto
 
-Após instalar executar os seguintes comandos.
+Após instalar, executar os seguintes comandos.
 
 $ npm install
 
 $ npm start
 
-A aplicação ficará disponível na url base http://localhost:5000
+A aplicação ficará disponível na url base http://localhost:3000
