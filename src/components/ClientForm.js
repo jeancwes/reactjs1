@@ -1,39 +1,22 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { connect } from 'react-redux'
-// import { Button, Col, Form, Row } from 'react-bootstrap';
-import { Button, Col, Form, Row } from 'react-bootstrap';
-// import { Formik, Form, Field } from 'formik';
-// import * as Yup from 'yup';
+import { Button, Col, Row } from 'react-bootstrap';
+import { Formik, Form, Field } from 'formik';
+
 import { postClient } from '../store/actions/client';
+import Client, { clientValidationSchema, clientInitialValues } from '../models/client'
+import { DatePickerField } from './DatePickerField'
 
 const axios = require('axios');
 
-// const SignupSchema = Yup.object().shape({
-//   name: Yup.string()
-//     .min(2, 'Too Short!')
-//     .max(50, 'Too Long!')
-//     .required('Required'),
-//   cpfCnpj: Yup.string()
-//     .min(2, 'Too Short!')
-//     .max(50, 'Too Long!')
-//     .required('Required'),
-//   email: Yup.string().email('Invalid email').required('Required'),
-// });
-
 function ClientForm(props) {
 
-  const [client, setClient] = useState(props.client);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    client.plans = [{ planId: 1 }];
-
-    axios.post('http://localhost:5000/api/clients', client)
+  const handleSubmit = (values) => {
+    axios.post('http://localhost:5000/api/clients', new Client(values))
       .then(function (response) {
         console.log(response);
         props.postClient(response.data);
-        props.onSubmit(e);
+        props.onSubmit();
       })
       .catch(function (error) {
         console.log(error);
@@ -41,103 +24,113 @@ function ClientForm(props) {
   }
 
   return (
-    // <>
-    //   <Formik
-    //    validationSchema={SignupSchema}
-    //    onSubmit={handleSubmit}
-    //  >
-    //    {({ errors, touched }) => (
-    //      <Form>
-    //         <Row>
-    //           <Col>
-    //             <label htmlFor="name">Nome</label>
-    //             <Field name="name" className="form-control" />
-    //             {errors.name && touched.name ? (
-    //               <div>{errors.name}</div>
-    //             ) : null}
-    //           </Col>
-    //           <Col>
-    //             <label htmlFor="cpfCnpj">CPF / CNPJ</label>
-    //             <Field name="cpfCnpj" className="form-control" />
-    //             {errors.cpfCnpj && touched.cpfCnpj ? (
-    //               <div>{errors.cpfCnpj}</div>
-    //             ) : null}
-    //           </Col>
-    //         </Row>
-    //        <Field name="email" type="email" />
-    //        {errors.email && touched.email ? <div>{errors.email}</div> : null}
-    //        <Button variant="primary" className="float-right" type="submit">
-    //         Salvar
-    //        </Button>
-    //      </Form>
-    //    )}
-    //  </Formik>
-    // </>
-    <Form onSubmit={handleSubmit}>
-      <Row>
-        <Col>
-          <Form.Group controlId="name">
-            <Form.Label>Nome</Form.Label>
-            <Form.Control type="text" placeholder="Informe seu nome"
-              onChange={e => setClient({ ...client, name: e.target.value })}
-            />
-          </Form.Group>
-        </Col>
-        <Col>
-          <Form.Group controlId="cpfCnpj">
-            <Form.Label>CPF / CNPJ</Form.Label>
-            <Form.Control type="text" placeholder="Informe seu CPF / CNPJ"
-              onChange={e => setClient({ ...client, cpfCnpj: e.target.value })}
-            />
-          </Form.Group>
-        </Col>
-      </Row>
-      <Row>
-        <Col>
-          <Form.Group controlId="rg">
-            <Form.Label>RG</Form.Label>
-            <Form.Control type="text" placeholder="Informe seu RG"
-              onChange={e => setClient({ ...client, rg: e.target.value })}
-            />
-          </Form.Group>
-        </Col>
-        <Col>
-          <Form.Group controlId="bornDate">
-            <Form.Label>Data de Nascimento</Form.Label>
-            <Form.Control type="date" placeholder="Informe sua Data de Nascimento"
-              onChange={e => setClient({ ...client, bornDate: e.target.value })}
-            />
-          </Form.Group>
-        </Col>
-      </Row>
-      <Row>
-        <Col>
-          <Form.Group controlId="phone">
-            <Form.Label>Telefone</Form.Label>
-            <Form.Control type="text" placeholder="Informe seu telefone"
-              onChange={e => setClient({ ...client, phone: e.target.value })}
-            />
-          </Form.Group>
-        </Col>
-        <Col>
-          <Form.Group controlId="email">
-            <Form.Label>Email</Form.Label>
-            <Form.Control type="email" placeholder="Informe seu email"
-              onChange={e => setClient({ ...client, email: e.target.value })}
-            />
-          </Form.Group>
-        </Col>
-      </Row>
-      <Button variant="primary" className="float-right" type="submit">
-        Salvar
-      </Button>
-    </Form>
+    <>
+      <Formik
+        initialValues={clientInitialValues}
+        validationSchema={clientValidationSchema}
+        isInitialValid={false}
+        onSubmit={(values, actions) => {
+          console.log(values);
+          console.log(actions);
+          handleSubmit(values);
+        }}
+      >
+        {({ errors, touched, values, setFieldValue, isValid }) => (
+          <Form>
+            <Row>
+              <Col md={6}>
+                <label htmlFor="name">Nome</label>
+                <Field name="name" className="form-control" />
+                {errors.name && touched.name ? (
+                  <div className="text-danger"><small>{errors.name}</small></div>
+                ) : null}
+              </Col>
+              <Col md={6}>
+                <label htmlFor="cpfCnpj">CPF / CNPJ</label>
+                <Field name="cpfCnpj" className="form-control" />
+                {errors.cpfCnpj && touched.cpfCnpj ? (
+                  <div className="text-danger"><small>{errors.cpfCnpj}</small></div>
+                ) : null}
+              </Col>
+              {values.cpfCnpj.length <= 11 ? (
+                <>
+                  <Col md={6}>
+                    <label htmlFor="rg">RG</label>
+                    <Field name="rg" className="form-control" />
+                    {errors.rg && touched.rg ? (
+                      <div className="text-danger"><small>{errors.rg}</small></div>
+                    ) : null}
+                  </Col>
+                  <Col md={6}>
+                    <label htmlFor="bornDate">Data de Nascimento</label>
+                    <DatePickerField
+                      name="bornDate"
+                      value={values.bornDate}
+                      onChange={setFieldValue}
+                    />
+                    {errors.bornDate && touched.bornDate ? (
+                      <div className="text-danger"><small>{errors.bornDate}</small></div>
+                    ) : null}
+                  </Col>
+                </>
+              ) : null}
+              <Col md={6}>
+                <label htmlFor="email">Email</label>
+                <Field name="email" className="form-control" />
+                {errors.email && touched.email ? (
+                  <div className="text-danger"><small>{errors.email}</small></div>
+                ) : null}
+              </Col>
+              <Col md={6}>
+                <label htmlFor="phone">Telefone</label>
+                <Field name="phone" className="form-control" />
+                {errors.phone && touched.phone ? (
+                  <div className="text-danger"><small>{errors.phone}</small></div>
+                ) : null}
+              </Col>
+              <Col md={6}>
+                <label htmlFor="plans">Planos</label>
+                <Field
+                  name="plans"
+                  className="form-control"
+                  as="select"
+                  multiple="multiple">
+                  {props.plans &&
+                    props.plans.map((element) => (
+                      <>
+                        {(element.isEndEffectiveDateValid()) && 
+                        (element.permitLegalPerson || values.cpfCnpj.length <= 11) ?
+                          (<option key={element.id} value={element.id}>
+                            {element.name} (Permite PJ: {element.permitLegalPersonLabel()})
+                          </option>
+                        ) : null}
+                      </>
+                    ))}
+                </Field>
+                {errors.plans && touched.plans ? (
+                  <div className="text-danger"><small>{errors.plans}</small></div>
+                ) : null}
+              </Col>
+            </Row>
+            <Row className="mt-3">
+              <Col md={12}>
+                <Button variant="primary" className="float-right" type="submit"
+                  disabled={!isValid}>
+                  Salvar
+                </Button>
+              </Col>
+            </Row>
+          </Form>
+        )}
+      </Formik>
+    </>
   );
 }
 
 function mapStateToProps(state) {
   return {
-    clients: state.clients
+    clients: state.clients,
+    plans: state.plans
   }
 }
 
@@ -151,6 +144,6 @@ function mapDispatchToProps(dispatch) {
 }
 
 export default connect(
-  mapStateToProps, 
+  mapStateToProps,
   mapDispatchToProps
 )(ClientForm);

@@ -15,8 +15,8 @@ class PlanRow extends React.Component {
         <td># {plan.id}</td>
         <td>{plan.name}</td>
         <td>{plan.permitLegalPersonLabel()}</td>
-        <td>{plan.startEffectiveDate}</td>
-        <td>{plan.endEffectiveDate}</td>
+        <td>{plan.startEffectiveDateLabel()}</td>
+        <td>{plan.endEffectiveDateLabel()}</td>
       </tr>
     );
   }

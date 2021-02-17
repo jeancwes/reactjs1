@@ -16,7 +16,7 @@ class ClientRow extends React.Component {
         <td>{client.name}</td>
         <td>{client.cpfCnpj}</td>
         <td>{client.rg}</td>
-        <td>{client.bornDate}</td>
+        <td>{client.bornDateLabel()}</td>
         <td>{client.phone}</td>
         <td>{client.email}</td>
       </tr>
@@ -34,7 +34,7 @@ class ClientTable extends React.Component {
       if (
         client.name.indexOf(filterText) === -1 &&
         client.cpfCnpj.indexOf(filterText) === -1 && 
-        client.bornDate.indexOf(filterText) === -1
+        client.bornDateLabel().indexOf(filterText) === -1
       ) {
         return;
       }
